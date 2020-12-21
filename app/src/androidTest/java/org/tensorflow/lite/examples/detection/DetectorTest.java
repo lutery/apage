@@ -35,6 +35,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import org.junit.Before;
@@ -61,19 +62,58 @@ public class DetectorTest {
   @Before
   public void setUp() throws IOException {
     detector =
-        TFLiteCDCPageIdentifyModel.create(
-            InstrumentationRegistry.getInstrumentation().getContext(),
-            CONFIG_FILE,
-            IS_MODEL_QUANTIZED);
+            TFLiteCDCPageIdentifyModel.create(
+                    InstrumentationRegistry.getInstrumentation().getContext(),
+                    CONFIG_FILE,
+                    IS_MODEL_QUANTIZED);
     int cropSize = MODEL_INPUT_SIZE;
     int sensorOrientation = 0;
+  }
+
+  @Test
+  public void detectionMorePage() throws Exception {
+    List<String> testFileName = Arrays.asList("page_more_0.jpg", "page_more_1.jpg");
+
+    for (String fileName : testFileName) {
+      final List<RecognitionCDC> results = detector.recognizeImage(loadImage(fileName));
+
+      for (RecognitionCDC result : results) {
+
+        Log.d(TAG, result.toString());
+      }
+    }
   }
 
   @Test
   public void detectionResultsShouldNotChange() throws Exception {
 //    Canvas canvas = new Canvas(croppedBitmap);
 //    canvas.drawBitmap(loadImage("table.jpg"), frameToCropTransform, null);
-    final List<RecognitionCDC> results = detector.recognizeImage(loadImage("5.jpg"));
+    final List<RecognitionCDC> results = detector.recognizeImage(loadImage("2_5_cut.jpg"));
+
+    for (RecognitionCDC result : results) {
+
+      Log.d(TAG, result.toString());
+    }
+  }
+
+  @Test
+  public void detectionResultsBySplit() throws Exception {
+//    Canvas canvas = new Canvas(croppedBitmap);
+//    canvas.drawBitmap(loadImage("table.jpg"), frameToCropTransform, null);
+    final List<RecognitionCDC> results = detector.recognizeImage(loadImage("7_1.png"));
+//    final List<RecognitionCDC> results = detector.recognizeImageBySplit(loadImage("7_1.png"));
+
+    for (RecognitionCDC result : results) {
+
+      Log.d(TAG, result.toString());
+    }
+  }
+
+  @Test
+  public void detectionLocFlag() throws Exception {
+//    Canvas canvas = new Canvas(croppedBitmap);
+//    canvas.drawBitmap(loadImage("table.jpg"), frameToCropTransform, null);
+    final List<RecognitionCDC> results = detector.recognizeImage(loadImage("9_11.jpg"));
 
     for (RecognitionCDC result : results) {
 
@@ -83,7 +123,7 @@ public class DetectorTest {
 
   private static Bitmap loadImage(String fileName) throws Exception {
     AssetManager assetManager =
-        InstrumentationRegistry.getInstrumentation().getContext().getAssets();
+            InstrumentationRegistry.getInstrumentation().getContext().getAssets();
     InputStream inputStream = assetManager.open(fileName);
     return BitmapFactory.decodeStream(inputStream);
   }
@@ -97,7 +137,7 @@ public class DetectorTest {
   // ...
   private static List<RecognitionCDC> loadRecognitions(String fileName) throws Exception {
     AssetManager assetManager =
-        InstrumentationRegistry.getInstrumentation().getContext().getAssets();
+            InstrumentationRegistry.getInstrumentation().getContext().getAssets();
     InputStream inputStream = assetManager.open(fileName);
     Scanner scanner = new Scanner(inputStream);
     List<RecognitionCDC> result = new ArrayList<>();
